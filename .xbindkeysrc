@@ -1,0 +1,19 @@
+# xbindkeys configuration file that allows mouse back and forward buttons 
+# to trigger Alt-left_arrow Alt-right_arrow instead of using the window manager's Forward and Back 
+# event. 
+# The buttons selected for these actions can vary by mouse. I use a Logiteck Trackman.
+# This allows for the mouse to work in situations where alt left/right would work but the 
+# mouse's Forward Back buttons wouldn't. 
+# This files should be placed in your home directory and xbindkeys should be installed 
+# and run on login by the windows manager (in gnome go to Startup Applications and add an entry for xbindkeys). 
+# Example:
+# sudo apt-get install xbindkeys
+# echo -e '[Desktop Entry]\nType=Application\nExec=xbindkeys\nHidden=false\nNoDisplay=false\nX-GNOME-Autostart-enabled=true\nName[en_US]=xbindkeys\nName=xbindkeys\nComment[en_US]=\nComment=' > ~/.config/autostart/xbindkeys.desktop
+
+#nautilus back
+"/usr/bin/xvkbd -xsendevent -text "\[Alt_L]\[Left]""
+  m:0x0 + b:8
+
+#nautilus forward
+"/usr/bin/xvkbd -xsendevent -text "\[Alt_L]\[Right]""
+  m:0x0 + b:9
