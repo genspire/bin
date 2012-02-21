@@ -1,0 +1,19 @@
+#!/bin/bash
+
+sourceDir="/home/robin/"
+snapshotDir="${sourceDir}.snapshots"
+#how many to keep around  (if this is run everyday then it would be the number of days to save)
+snapshotCount=7
+
+cd $snapshotDir
+#remove oldest dir
+rm -rf backup.$snapshotCount
+
+#move each old backup over to by one e.g. backup.1 goes to backup.2
+for (( i=$(($count-1)); i>=0; i-- ))
+do 
+   mv backup.$i backup.$(($i+1)) 
+done
+
+rsync -a --exclude=$snapshotDir --delete --link-dest=../backup.1 $sourceDir  backup.0/
+
