@@ -1,19 +1,40 @@
 #!/bin/bash
 
-sourceDir="/home/robin/"
+# This script creates a snapshot of the $sourceDir directory every time it is run.
+# It keeps $snapshotCount number of snapshots around. 
+# The idea is that you would put this into your bin directory and run it using cron 
+# on a daily basis so you can get to older versions of files if you make a change you don't like. 
+# This script assumes that there is a directory under the source directory called .snapshots
+# It is better if you make the .snapshots directory a symlink to another partition or disk. 
+# 
+# This script is a generalization of information contained at: http://www.mikerubel.org/computers/rsync_snapshots/#Incremental
+
+#lead slash is important
+sourceDir=~/
 snapshotDir="${sourceDir}.snapshots"
+logFile="$snapshotDir/snapshot.log"
 #how many to keep around  (if this is run everyday then it would be the number of days to save)
 snapshotCount=7
 
+echo -e "\n****************************************************\nBacking up $sourceDir to ${snapshotDir}/backup.0 on $(date)" >> $logFile
+
+# chang directory to the where snapshots are stored and check that we got there
 cd $snapshotDir
+if [ `pwd` != $snapshotDir ] 
+then
+	echo "Error: Snapshot directory was not found: $snapshotDir" | tee -a $logFile
+	exit 1
+fi
+
 #remove oldest dir
 rm -rf backup.$snapshotCount
 
-#move each old backup over to by one e.g. backup.1 goes to backup.2
-for (( i=$(($count-1)); i>=0; i-- ))
+#move each old backup over by one index e.g. backup.1 goes to backup.2
+for (( i=$(($snapshotCount-1)); i>=0; i-- ))
 do 
-   mv backup.$i backup.$(($i+1)) 
+   mv backup.$i backup.$(($i+1)) 2>&1 | tee -a $logFile
 done
 
-rsync -a --exclude=$snapshotDir --delete --link-dest=../backup.1 $sourceDir  backup.0/
+#appends both stdin and stderr to logfile
+rsync -a --exclude=$snapshotDir --delete --link-dest=../backup.1 $sourceDir  backup.0/ 2>&1 | tee -a $logFile
 
