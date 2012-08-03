@@ -1,5 +1,8 @@
 #!/bin/bash
 
+# The only parameter is the path to the directory to be snapshot *with a leading slash*
+# The snapshots will be saved into a .shapshots directory within the target directory 
+#
 # This script creates a snapshot of the $sourceDir directory every time it is run.
 # It keeps $snapshotCount number of snapshots around. 
 # The idea is that you would put this into your bin directory and run it using cron 
@@ -9,8 +12,15 @@
 # 
 # This script is a generalization of information contained at: http://www.mikerubel.org/computers/rsync_snapshots/#Incremental
 
-#lead slash is important
-sourceDir=~/
+if [ $# != 1 ]
+then
+	echo "Error: Not enough arguments given. Need the direcotry to snapshot" | tee -a $logFile
+        exit 1
+fi
+
+
+#The directory to snapshot. Lead slash is important
+sourceDir=$1
 snapshotDir="${sourceDir}.snapshots"
 logFile="$snapshotDir/snapshot.log"
 #how many to keep around  (if this is run everyday then it would be the number of days to save)
