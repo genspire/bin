@@ -1,0 +1,5 @@
+#!/bin/bash
+
+sudo mv /usr/lib/libneon-gnutls.so.27 /usr/lib/libneon-gnutls.so.27.old
+sudo ln -s /usr/lib/libneon.so.27 /usr/lib/libneon-gnutls.so.27
+
