@@ -1,7 +1,7 @@
 #!/bin/bash
 
 # The only parameter is the path to the directory to be snapshot *with a leading slash*
-# The snapshots will be saved into a .shapshots directory within the target directory 
+# The snapshots will be saved into a .snapshots directory within the target directory 
 #
 # This script creates a snapshot of the $sourceDir directory every time it is run.
 # It keeps $snapshotCount number of snapshots around. 
