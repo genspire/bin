@@ -1,0 +1,22 @@
+#!/bin/bash
+#copy this into /usr/lib/pm-utils/sleep.d/
+
+logger -t "Robin************" "FIXMIC"
+case $1 in
+    hibernate)
+        ;;
+    suspend)
+        ;;
+    thaw)
+	logger -t "Robin MICFIX************" "thawing"
+	su robin -c "/usr/bin/pacmd set-default-source alsa_input.usb-AKM_AK5370-00-AK5370.analog-mono"
+        ;;
+    resume)
+	logger -t "Robin MICFIX************" "resuming"
+	su robin -c "/usr/bin/pacmd set-default-source alsa_input.usb-AKM_AK5370-00-AK5370.analog-mono"
+        ;;
+    *)  echo "ERROR: called incorrectly."
+        ;;
+esac
+
+logger -t "Robin Test************" "DONE FIXMIC"
