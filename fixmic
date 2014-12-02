@@ -1,0 +1,4 @@
+#!/bin/bash
+
+# set the mic to the external one
+logger -t "MICFIX: " "`/usr/bin/pacmd set-default-source alsa_input.usb-AKM_AK5370-00-AK5370.analog-mono`"
