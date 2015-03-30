@@ -13,7 +13,7 @@ val inResolved = Seq("git", "branch", "-a", "--merged", "origin/resolved")
 val inPoReady = Seq("git", "branch", "-a", "--merged", "origin/po_ready")
 //val poReadyLogs = Seq("git", "log", "po_ready")
 val inOooPilot = Seq("git", "branch", "-a", "--merged", "origin/ooo_pilot")
-val branch = Seq("git", "branch", "-r")
+val branchExists = Seq("git", "branch", "-ar")
 
 val latestCommit = Seq("git", "log", "-1", "--format=%H")
 val commitSearch = Seq("git", "branch", "-r", "--contains")
@@ -28,26 +28,31 @@ for(ticketId <- args.sorted)
 	yield {
 		println("\n***** Ticket " + ticketId + " ******")
 
-		val latestTicketCommit = latestBranchCommit(ticketBranch(ticketId))
+		if(foundTicket(ticketId, branchExists)){
+			val latestTicketCommit = latestBranchCommit(ticketBranch(ticketId))
 
-		println(s"Latest ticket branch commit: $latestTicketCommit\n")
+			println(s"Latest ticket branch commit: $latestTicketCommit\n")
 
-		if(!foundTicket(ticketId, inResolved)) println("Not found in resolved")
-		else{
-			if(foundCommitInBranch(latestTicketCommit, "origin/resolved")) println("Found in resolved")
-			else println("Latest commit not found on resolved branch")
+			if(!foundTicket(ticketId, inResolved)) println("Not found in resolved")
+			else{
+				if(foundCommitInBranch(latestTicketCommit, "origin/resolved")) println("Found in resolved")
+				else println("Latest commit not found on resolved branch")
+			}
+
+			if(!foundTicket(ticketId, inPoReady)) println("Not found in po_ready")
+			else{
+				if(foundCommitInBranch(latestTicketCommit, "origin/po_ready")) println("Found in po_ready")
+				else println("Latest commit not found on po_ready branch")
+			}
+
+			if(!foundTicket(ticketId, inOooPilot)) println("Not found in ooo_pilot")
+			else{
+				if(foundCommitInBranch(latestTicketCommit, "origin/ooo_pilot"))	println("Found in ooo_pilot")
+				else println("Latest commit not found on ooo_pilot branch")
+			}
 		}
-
-		if(!foundTicket(ticketId, inPoReady)) println("Not found in po_ready")
 		else{
-			if(foundCommitInBranch(latestTicketCommit, "origin/po_ready")) println("Found in po_ready")
-			else println("Latest commit not found on po_ready branch")
-		}
-
-		if(!foundTicket(ticketId, inOooPilot)) println("Not found in ooo_pilot")
-		else{
-			if(foundCommitInBranch(latestTicketCommit, "origin/ooo_pilot"))	println("Found in ooo_pilot")
-			else println("Latest commit not found on ooo_pilot branch")
+			println("No branch exists for this ticket")
 		}
 	}
 
