@@ -12,7 +12,8 @@ val inResolved = Seq("git", "branch", "-a", "--merged", "origin/resolved")
 //val resolvedLogs = Seq("git", "log", "resolved")
 val inPoReady = Seq("git", "branch", "-a", "--merged", "origin/po_ready")
 //val poReadyLogs = Seq("git", "log", "po_ready")
-val inOooPilot = Seq("git", "branch", "-a", "--merged", "origin/ooo_pilot")
+val bugBranchName = "mhac"
+val inBug = Seq("git", "branch", "-a", "--merged", s"origin/$bugBranchName")
 val branchExists = Seq("git", "branch", "-ar")
 
 val latestCommit = Seq("git", "log", "-1", "--format=%H")
@@ -33,6 +34,7 @@ for(ticketId <- args.sorted)
 
 			println(s"Latest ticket branch commit: $latestTicketCommit\n")
 
+			//TODO: this should be made generic with a list of branches to check
 			if(!foundTicket(ticketId, inResolved)) println("Not found in resolved")
 			else{
 				if(foundCommitInBranch(latestTicketCommit, "origin/resolved")) println("Found in resolved")
@@ -45,10 +47,10 @@ for(ticketId <- args.sorted)
 				else println("Latest commit not found on po_ready branch")
 			}
 
-			if(!foundTicket(ticketId, inOooPilot)) println("Not found in ooo_pilot")
+			if(!foundTicket(ticketId, inBug)) println(s"Not found in $bugBranchName")
 			else{
-				if(foundCommitInBranch(latestTicketCommit, "origin/ooo_pilot"))	println("Found in ooo_pilot")
-				else println("Latest commit not found on ooo_pilot branch")
+				if(foundCommitInBranch(latestTicketCommit, s"origin/$bugBranchName"))	println(s"Found in $bugBranchName")
+				else println(s"Latest commit not found on $bugBranchName branch")
 			}
 		}
 		else{
