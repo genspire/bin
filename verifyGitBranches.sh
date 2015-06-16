@@ -1,16 +1,20 @@
 #!/bin/sh
 exec scala "$0" "$@"
 !#
-/* This script takes in a list of ticket numbers and outputs whether each ticket is found on resolved or po_ready. 
+/* This script takes in a list of ticket numbers and outputs whether each ticket is found on our release branches. 
    If the ticket cannot be found in either, then git is queried to find out if there exists a branch for the ticket
 */ 
 
 import sys.process._
 import java.io.File
 
-val inResolved = Seq("git", "branch", "-a", "--merged", "origin/resolved")
-val inPoReady = Seq("git", "branch", "-a", "--merged", "origin/po_ready")
 val bugBranchName = "pc_pilot"
+val testBranchName = "resolved"
+val stagingBranchName = "master"
+
+val inTestBranch = Seq("git", "branch", "-a", "--merged", s"origin/$testBranchName")
+val inStagingBranch = Seq("git", "branch", "-a", "--merged", s"origin/stagingBranchName")
+
 val inBug = Seq("git", "branch", "-a", "--merged", s"origin/$bugBranchName")
 val branchExists = Seq("git", "branch", "-ar")
 
@@ -19,7 +23,17 @@ val commitSearch = Seq("git", "branch", "-r", "--contains")
 
 
 def foundTicket(ticketId :String, command : Seq[String]) = (command #| Seq("grep", ticketId)).lineStream_! nonEmpty
-def ticketBranch(ticketId:String) = "origin/t" + ticketId
+def ticketBranch(ticketId:String) = {
+	var pre = ""
+	try{
+		Integer.parseInt(ticketId.substring(0,1))
+		pre = "t"
+	}
+	catch {
+  		case e:Exception =>
+  	}
+	"origin/" + pre + ticketId
+}
 def latestBranchCommit(branch:String) = (latestCommit :+ branch).!!.trim
 def foundCommitInBranch(commit:String, branch:String) =  ((commitSearch :+ commit) #| Seq("grep", branch)).lineStream_! nonEmpty
 
@@ -33,16 +47,16 @@ for(ticketId <- args.sorted)
 			println(s"Latest ticket branch commit: $latestTicketCommit\n")
 
 			//TODO: this should be made generic with a list of branches to check
-			if(!foundTicket(ticketId, inResolved)) println("Not found in resolved (or latest commit is missing)")
+			if(!foundTicket(ticketId, inTestBranch)) println(s"Not found in $testBranchName (or latest commit is missing)")
 			else{
-				if(foundCommitInBranch(latestTicketCommit, "origin/resolved")) println("Found in resolved")
-				else println("Latest commit not found on resolved branch")
+				if(foundCommitInBranch(latestTicketCommit, s"origin/$testBranchName")) println(s"Found in $testBranchName")
+				else println(s"Latest commit not found on $testBranchName branch")
 			}
 
-			if(!foundTicket(ticketId, inPoReady)) println("Not found in po_ready (or latest commit is missing)")
+			if(!foundTicket(ticketId, inStagingBranch)) println(s"Not found in $stagingBranchName (or latest commit is missing)")
 			else{
-				if(foundCommitInBranch(latestTicketCommit, "origin/po_ready")) println("Found in po_ready")
-				else println("Latest commit not found on po_ready branch")
+				if(foundCommitInBranch(latestTicketCommit, s"origin/$stagingBranchName")) println(s"Found in $stagingBranchName")
+				else println(s"Latest commit not found on $stagingBranchName branch")
 			}
 
 			if(!foundTicket(ticketId, inBug)) println(s"Not found in $bugBranchName (or latest commit is missing)")
@@ -56,8 +70,8 @@ for(ticketId <- args.sorted)
 		}
 	}
 
-println("\n***************************************************************\n*** List commits which differ between resolved and po_ready ***\n")
-println(Seq("git", "show-branch", "origin/resolved", "origin/po_ready").!!)
+println(s"\n***************************************************************\n*** List commits which differ between $testBranchName and $stagingBranchName ***\n")
+println(Seq("git", "show-branch", s"origin/$testBranchName", s"origin/$stagingBranchName").!!)
 
 
 println("\n************************** GIT LAST UPDATE ***************************")
