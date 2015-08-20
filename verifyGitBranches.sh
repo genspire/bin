@@ -8,12 +8,12 @@ exec scala "$0" "$@"
 import sys.process._
 import java.io.File
 
-val bugBranchName = "pc_pilot"
+val bugBranchName = None
 val testBranchName = "resolved"
 val stagingBranchName = "master"
 
 val inTestBranch = Seq("git", "branch", "-a", "--merged", s"origin/$testBranchName")
-val inStagingBranch = Seq("git", "branch", "-a", "--merged", s"origin/stagingBranchName")
+val inStagingBranch = Seq("git", "branch", "-a", "--merged", s"origin/$stagingBranchName")
 
 val inBug = Seq("git", "branch", "-a", "--merged", s"origin/$bugBranchName")
 val branchExists = Seq("git", "branch", "-ar")
@@ -59,10 +59,12 @@ for(ticketId <- args.sorted)
 				else println(s"Latest commit not found on $stagingBranchName branch")
 			}
 
-			if(!foundTicket(ticketId, inBug)) println(s"Not found in $bugBranchName (or latest commit is missing)")
-			else{
-				if(foundCommitInBranch(latestTicketCommit, s"origin/$bugBranchName"))	println(s"Found in $bugBranchName")
-				else println(s"Latest commit not found on $bugBranchName branch")
+			if(bugBranchName != None){
+				if(!foundTicket(ticketId, inBug)) println(s"Not found in $bugBranchName (or latest commit is missing)")
+				else{
+					if(foundCommitInBranch(latestTicketCommit, s"origin/$bugBranchName"))	println(s"Found in $bugBranchName")
+					else println(s"Latest commit not found on $bugBranchName branch")
+				}
 			}
 		}
 		else{
