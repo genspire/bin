@@ -1,0 +1,3 @@
+#!/bin/bash
+
+git fetch -p && echo "$(git for-each-ref --format '%(refname) %(upstream:track)' refs/heads | awk '$2 == "[gone]" {sub("refs/heads/", "", $1); print $1}')" > /tmp/branches-to-prune && vi /tmp/branches-to-prune && xargs git branch -d < /tmp/branches-to-prune 
