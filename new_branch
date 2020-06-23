@@ -1,0 +1,26 @@
+#!/bin/zsh
+# 1. Prompts user for ticket number, then ticket title
+# 2. Shows user an editable gitflow branch name for a feature
+# 3. After branch name is edited and user hits enter the branch is created locally
+# 4. User is prompted to push new branch to origin
+
+vared -p "Enter issue number: " -c number
+
+vared -p "Enter issue title: " -c title
+title_no_space="${title// /_}"
+
+branch_name="feature/Issue_#${number}_${title_no_space}"
+
+vared -p "Enter the issue title: " branch_name
+
+git checkout -b $branch_name
+
+echo "\n\nBranch created: $branch_name\n"
+
+vared -p "Push empty branch to origin? (y|[n])  " -c push 
+
+if [[ $push = y ]]
+then
+  git push -u origin $branch_name
+  echo "\nPushed empty branch to origin"
+fi
