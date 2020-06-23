@@ -1,0 +1,25 @@
+#!/usr/bin/env python3
+
+import argparse
+import sys 
+import subprocess
+
+if __name__ == "__main__":
+
+  if len(sys.argv) != 2:  
+    print(f"Give branch text to search for. args: {sys.argv}")
+    sys.exit(1)
+  q = sys.argv[1]
+  lines = subprocess.check_output(['git', 'branch', '-a']).splitlines()
+  branches = set([ b.decode("utf-8").strip().replace("remotes/", "").replace("origin/", "").split()[0] for b in lines ])
+  matches = [b for b in branches if q in str(b)]
+
+  if len(matches) > 1:
+    print("Multiple matches:\n")
+    for m in matches:
+      print(m.strip())
+    exit(1)
+  elif len(matches) == 0:
+    print("No maches found")
+    exit(2)
+  subprocess.run(['git', 'checkout', matches[0]])
